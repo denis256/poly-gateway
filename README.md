@@ -1,11 +1,25 @@
 # poly-gateway
 
-API gateway service which match HTTP requests by patterns and query appropriate service for results
+API gateway service which match HTTP requests by patterns and query appropriate service for results.
 
-Stack:
+## Modules
+
+poly-gateway-model - model objects, used to handle requests, responses
+
+poly-gateway - gateway service which handle requests
+
+poly-gateway-client - default client to gateway
+
+## Stack
+
  Java 8
+
+ Spring Cloud: eureka, hystrix 
+ 
  Spring Boot 1.4.x
+
  Vaadin
+
  Gradle
 
 
