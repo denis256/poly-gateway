@@ -14,6 +14,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
+import org.springframework.web.bind.annotation.ControllerAdvice;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
@@ -53,7 +55,7 @@ class GatewayController {
 	@Autowired
 	private ServiceMapper serviceMapper;
 
-	@HystrixCommand(fallbackMethod = "fallback")
+	//@HystrixCommand(fallbackMethod = "fallback")
 	@RequestMapping("/**")
 	public void handle(HttpServletResponse httpServletResponse) {
 
@@ -114,7 +116,7 @@ class GatewayController {
 
 			LOG.info("Service request {}", serviceRequest);
 
-			String serviceUri = serviceMapping.getServiceName() + "/service";
+			String serviceUri = "http://" + serviceMapping.getServiceName() + "/service";
 			LOG.info("service request for {}", serviceUri);
 
 			HttpHeaders headers = new HttpHeaders();
@@ -169,5 +171,27 @@ class GatewayController {
 			LOG.error("Failed to generate fallback response",e );
 		}
 	}
+
+}
+
+@ControllerAdvice
+class ErorrHandler {
+
+	@Autowired
+	private ObjectMapper objectMapper;
+
+	private static Logger LOG = LoggerFactory.getLogger(ErorrHandler.class);
+
+	@ExceptionHandler(value = Exception.class)
+	public void fallback(HttpServletResponse httpServletResponse) {
+		ServiceResponse serviceResponse = new ServiceResponse();
+		serviceResponse.setStatus(ServiceResponse.Status.ERROR);
+		try {
+			objectMapper.writeValue(httpServletResponse.getOutputStream(), serviceResponse);
+		} catch (IOException e) {
+			LOG.error("Failed to generate fallback response",e );
+		}
+	}
+
 
 }

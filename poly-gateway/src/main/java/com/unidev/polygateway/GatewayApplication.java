@@ -8,6 +8,7 @@ import org.springframework.boot.web.servlet.ServletContextInitializer;
 import org.springframework.cloud.client.circuitbreaker.EnableCircuitBreaker;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.cloud.client.loadbalancer.LoadBalanced;
+import org.springframework.cloud.netflix.zuul.EnableZuulProxy;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 import org.springframework.web.client.RestTemplate;
@@ -19,6 +20,7 @@ import javax.servlet.ServletException;
 @EnableDiscoveryClient
 @EnableCircuitBreaker
 @EnableMongoRepositories
+@EnableZuulProxy
 public class GatewayApplication implements ServletContextInitializer {
 
 	public static void main(String[] args) {
