@@ -21,6 +21,7 @@ import org.springframework.web.client.RestTemplate;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -159,10 +160,14 @@ class GatewayController {
 		return ;
 	}
 
-	public ServiceResponse fallback() {
+	public void fallback(HttpServletResponse httpServletResponse) {
 		ServiceResponse serviceResponse = new ServiceResponse();
 		serviceResponse.setStatus(ServiceResponse.Status.ERROR);
-		return serviceResponse;
+		try {
+			objectMapper.writeValue(httpServletResponse.getOutputStream(), serviceResponse);
+		} catch (IOException e) {
+			LOG.error("Failed to generate fallback response",e );
+		}
 	}
 
 }
