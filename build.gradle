@@ -12,11 +12,11 @@ subprojects {
 
     if (project.hasProperty('travisEnv')) {
         repositories {
-            maven { url 'http://nexus.oss.universal-development.com/releases' }
-            maven { url 'http://nexus.oss.universal-development.com/snapshots' }
             mavenCentral()
             mavenLocal()
             jcenter()
+            maven { url 'http://nexus.oss.universal-development.com/releases' }
+            maven { url 'http://nexus.oss.universal-development.com/snapshots' }
         }
     } else {
         apply from: 'http://dev.local/gradle/uploadArchivesSftp.groovy'
