@@ -1,0 +1,4 @@
+dependencies {
+
+	compile("com.unidev.platform:unidev-dto:$project.unidevPlatformVersion")
+}
