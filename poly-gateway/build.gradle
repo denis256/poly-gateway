@@ -20,9 +20,13 @@ repositories {
 	mavenCentral()
 }
 
+repositories {
+    maven { url 'http://maven.restlet.org' }
+}
 
 dependencies {
 	compile("com.unidev.platform:unidev-j2ee:$project.unidevPlatformVersion")
+    compile 'org.jminix:jminix:1.2.0'
     compile('org.springframework.boot:spring-boot-starter-data-mongodb')
 	compile('org.springframework.boot:spring-boot-starter-actuator')
 	compile('org.springframework.cloud:spring-cloud-starter-eureka')
