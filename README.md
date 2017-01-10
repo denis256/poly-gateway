@@ -1,5 +1,7 @@
 # poly-gateway
 
+[![Build Status](https://travis-ci.org/universal-development/poly-gateway.svg?branch=master)](https://travis-ci.org/universal-development/poly-gateway)
+
 API gateway service which match HTTP requests by patterns and query appropriate service for results.
 
 ## Modules
