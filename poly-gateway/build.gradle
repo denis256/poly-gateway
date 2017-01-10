@@ -22,6 +22,8 @@ repositories {
 
 
 dependencies {
+	compile("com.unidev.platform:unidev-j2ee:$project.unidevPlatformVersion")
+
 	compile('org.springframework.boot:spring-boot-starter-actuator')
 	compile('org.springframework.cloud:spring-cloud-starter-eureka')
 	compile('org.springframework.cloud:spring-cloud-starter-hystrix')
