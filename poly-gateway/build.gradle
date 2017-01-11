@@ -24,6 +24,11 @@ repositories {
     maven { url 'http://maven.restlet.org' }
 }
 
+
+springBoot {
+	executable = true
+}
+
 dependencies {
     compile project(":poly-gateway-model")
     compile("com.unidev.platform:unidev-strings:$project.unidevPlatformVersion")
