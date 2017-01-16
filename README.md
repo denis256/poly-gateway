@@ -4,8 +4,10 @@
 
 API gateway service which match HTTP requests by patterns and query appropriate service for results.
 
-Released version 0.0.1, Gradle dependency 
-`compile com.unidev.polygateway:poly-gateway:0.0.1`
+Released version 0.0.1
+
+Gradle dependency 
+```compile 'com.unidev.polygateway:poly-gateway:0.0.1' ```
 
 ## Modules
 
