@@ -28,6 +28,10 @@ poly-gateway-client - default client to gateway
  Gradle
 
 
+# Building
+To build project, try
+`./gradlew build -PXunidev`
+
 License
 =======
  
