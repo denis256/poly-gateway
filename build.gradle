@@ -10,7 +10,7 @@ subprojects {
     apply plugin: 'java'
     apply plugin: 'idea'
 
-    if (project.hasProperty('travisEnv')) {
+    if (project.hasProperty('Xunidev')) {
         repositories {
             mavenCentral()
             mavenLocal()

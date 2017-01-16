@@ -2,6 +2,6 @@ language: java
 jdk:
   - oraclejdk8
 install:
- - ./gradlew assemble  -PtravisEnv
+ - ./gradlew assemble  -PXunidev
 script:
-  - ./gradlew clean test  -PtravisEnv
+  - ./gradlew clean test  -PXunidev
