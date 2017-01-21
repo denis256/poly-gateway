@@ -56,7 +56,7 @@ class GatewayController {
 	private ServiceMapper serviceMapper;
 
 	//@HystrixCommand(fallbackMethod = "fallback")
-	@RequestMapping("/**")
+	@RequestMapping("/query")
 	public void handle(HttpServletResponse httpServletResponse) {
 
 		String uri = httpServletRequest.getRequestURI();
