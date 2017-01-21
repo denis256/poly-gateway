@@ -2,6 +2,8 @@ package com.unidev.polygateway;
 
 import com.unidev.platform.j2ee.common.WebUtils;
 import org.jminix.console.servlet.MiniConsoleServlet;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.web.servlet.ServletContextInitializer;
@@ -11,6 +13,7 @@ import org.springframework.cloud.client.loadbalancer.LoadBalanced;
 import org.springframework.cloud.netflix.zuul.EnableZuulProxy;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
@@ -62,6 +65,19 @@ public class GatewayApplication extends WebSecurityConfigurerAdapter implements 
 				.and()
 				.logout()
 				.permitAll();
+	}
+
+	@Value("${admin.user}")
+	private String adminUser;
+
+	@Value("${admin.password}")
+	private String adminPassword;
+
+	@Autowired
+	public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
+		auth
+				.inMemoryAuthentication()
+				.withUser(adminUser).password(adminPassword).roles("ADMIN");
 	}
 
 }
