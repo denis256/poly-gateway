@@ -11,6 +11,9 @@ import org.springframework.cloud.client.loadbalancer.LoadBalanced;
 import org.springframework.cloud.netflix.zuul.EnableZuulProxy;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.web.client.RestTemplate;
 
 import javax.servlet.ServletContext;
@@ -21,7 +24,8 @@ import javax.servlet.ServletException;
 @EnableCircuitBreaker
 @EnableMongoRepositories
 @EnableZuulProxy
-public class GatewayApplication implements ServletContextInitializer {
+@EnableWebSecurity
+public class GatewayApplication extends WebSecurityConfigurerAdapter implements ServletContextInitializer {
 
 	public static void main(String[] args) {
 		SpringApplication.run(GatewayApplication.class, args);
@@ -42,6 +46,23 @@ public class GatewayApplication implements ServletContextInitializer {
     public void onStartup(ServletContext servletContext) throws ServletException {
         servletContext.addServlet("JmxMiniConsoleServlet", MiniConsoleServlet.class).addMapping("/jmx/*");
     }
+
+	@Override
+	protected void configure(HttpSecurity http) throws Exception {
+		http.csrf().disable();
+		http
+				.authorizeRequests()
+				.antMatchers("/jmx/**", "/logs").hasRole("ADMIN")
+				.antMatchers("/**", "/").permitAll()
+				.anyRequest().authenticated()
+				.and()
+				.formLogin()
+				.loginPage("/login")
+				.permitAll()
+				.and()
+				.logout()
+				.permitAll();
+	}
 
 }
 
