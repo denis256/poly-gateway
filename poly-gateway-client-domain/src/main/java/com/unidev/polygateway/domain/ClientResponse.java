@@ -6,7 +6,7 @@ import com.unidev.platform.common.dto.response.ResponseWithVersion;
 /**
  * Response from service
  */
-public class ServiceResponse extends ResponseWithVersion<String, ServiceResponse.Status, ClientResponsePayload>  {
+public class ClientResponse extends ResponseWithVersion<String, ClientResponse.Status, ClientResponsePayload>  {
 
     public enum Status { OK, ERROR}
 
