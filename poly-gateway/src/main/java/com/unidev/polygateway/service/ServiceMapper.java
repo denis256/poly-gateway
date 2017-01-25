@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Service which identify service by url pattern
@@ -47,23 +48,15 @@ public class ServiceMapper {
     }
 
     /**
-     * Check if url matching pattern
-     * @param url
+     * Fetch service mapping by external name
      * @return
      */
-    public ServiceMapping match(String url) {
-        List<ServiceMapping> list = list();
-        for(ServiceMapping serviceMapping : list) {
-            try {
-                if (url.matches(serviceMapping.getUrlPattern())) { //TODO: use db pattern matching
-                    return serviceMapping;
-                }
-            }catch (Throwable t) {
-                LOG.warn("Error processing  {}", serviceMapping, t);
-            }
+    public Optional<ServiceMapping> match(String externalServiceName) {
+        ServiceMapping serviceMapping = serviceMappingRepository.findOne(externalServiceName);
+        if (serviceMapping != null) {
+            return Optional.of(serviceMapping);
         }
-        LOG.warn("No matching service for {}", url);
-        return null;
+        return Optional.empty();
     }
 
 }
