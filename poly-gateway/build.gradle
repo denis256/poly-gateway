@@ -32,7 +32,7 @@ springBoot {
 }
 
 dependencies {
-    compile project(":poly-gateway-model")
+    compile project(":poly-gateway-domain")
     compile("com.unidev.platform:unidev-strings:$project.unidevPlatformVersion")
     compile("com.unidev.platform:unidev-j2ee:$project.unidevPlatformVersion")
     compile 'org.jminix:jminix:1.2.0'
