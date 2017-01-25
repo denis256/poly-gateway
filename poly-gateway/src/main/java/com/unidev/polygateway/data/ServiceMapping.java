@@ -1,47 +1,27 @@
 package com.unidev.polygateway.data;
 
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.util.HashMap;
-
 /**
- * Entity for mapping url patterns to service
+ * Entity for mapping  external services to internal names
  */
-@Document(collection = "services")
+@Document(collection = "services_mapping")
 public class ServiceMapping {
 
     @Id
-    private String id;
+    private String clientServiceName;
 
-    private String urlPattern;
-
+    @Indexed
     private String serviceName;
 
-    private HashMap<String, Object> customParameters = new HashMap<>();
-
-    public HashMap<String, Object> getCustomParameters() {
-        return customParameters;
+    public String getClientServiceName() {
+        return clientServiceName;
     }
 
-    public void setCustomParameters(HashMap<String, Object> customParameters) {
-        this.customParameters = customParameters;
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public String getUrlPattern() {
-        return urlPattern;
-    }
-
-    public void setUrlPattern(String urlPattern) {
-        this.urlPattern = urlPattern;
+    public void setClientServiceName(String clientServiceName) {
+        this.clientServiceName = clientServiceName;
     }
 
     public String getServiceName() {
@@ -50,35 +30,5 @@ public class ServiceMapping {
 
     public void setServiceName(String serviceName) {
         this.serviceName = serviceName;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        ServiceMapping that = (ServiceMapping) o;
-
-        if (id != null ? !id.equals(that.id) : that.id != null) return false;
-        if (urlPattern != null ? !urlPattern.equals(that.urlPattern) : that.urlPattern != null) return false;
-        return !(serviceName != null ? !serviceName.equals(that.serviceName) : that.serviceName != null);
-
-    }
-
-    @Override
-    public int hashCode() {
-        int result = id != null ? id.hashCode() : 0;
-        result = 31 * result + (urlPattern != null ? urlPattern.hashCode() : 0);
-        result = 31 * result + (serviceName != null ? serviceName.hashCode() : 0);
-        return result;
-    }
-
-    @Override
-    public String toString() {
-        return "ServiceMapping{" +
-                "id='" + id + '\'' +
-                ", urlPattern='" + urlPattern + '\'' +
-                ", serviceName='" + serviceName + '\'' +
-                '}';
     }
 }
