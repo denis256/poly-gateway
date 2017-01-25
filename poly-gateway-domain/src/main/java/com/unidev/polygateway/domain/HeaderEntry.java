@@ -1,4 +1,4 @@
-package com.unidev.polygateway.model;
+package com.unidev.polygateway.domain;
 
 /**
  * Header entry mappting value
