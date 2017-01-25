@@ -2,6 +2,8 @@ package com.unidev.polygateway;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.unidev.platform.j2ee.common.WebUtils;
+import com.unidev.polygateway.domain.ClientResponsePayload;
+import com.unidev.polygateway.domain.ResponseStatus;
 import com.unidev.polygateway.domain.ServiceResponse;
 import com.unidev.polygateway.service.ServiceMapper;
 import org.slf4j.Logger;
@@ -23,8 +25,9 @@ import java.io.IOException;
 @RestController
 class GatewayController {
 
-	private static Logger LOG = LoggerFactory.getLogger(GatewayController.class);
+	public static final String GATEWAY_VERSION = "0.1.0";
 
+	private static Logger LOG = LoggerFactory.getLogger(GatewayController.class);
 
 	@Autowired
 	private HttpServletRequest httpServletRequest;
@@ -42,8 +45,13 @@ class GatewayController {
 	private ServiceMapper serviceMapper;
 
 	//@HystrixCommand(fallbackMethod = "fallback")
-	@RequestMapping("/service")
-	public void handle(HttpServletResponse httpServletResponse) {
+	@RequestMapping("/gateway")
+	public ServiceResponse<ClientResponsePayload> handle(HttpServletResponse httpServletResponse) {
+
+		ServiceResponse<ClientResponsePayload> serviceResponse = new ServiceResponse<>();
+		serviceResponse.setStatus(ResponseStatus.ERROR);
+		serviceResponse.setVersion(GatewayController.GATEWAY_VERSION);
+		return serviceResponse;
 
 //		String uri = httpServletRequest.getRequestURI();
 //		LOG.debug("Processing request {}", uri);
@@ -146,16 +154,14 @@ class GatewayController {
 //		}
 //
 //		return ;
+//		return null;
 	}
 
-	public void fallback(HttpServletResponse httpServletResponse) {
-		ServiceResponse serviceResponse = new ServiceResponse();
-		serviceResponse.setStatus(ServiceResponse.Status.ERROR);
-		try {
-			objectMapper.writeValue(httpServletResponse.getOutputStream(), serviceResponse);
-		} catch (IOException e) {
-			LOG.error("Failed to generate fallback response",e );
-		}
+	public ServiceResponse<ClientResponsePayload> fallback(HttpServletResponse httpServletResponse) {
+		ServiceResponse<ClientResponsePayload> serviceResponse = new ServiceResponse<>();
+		serviceResponse.setStatus(ResponseStatus.ERROR);
+		serviceResponse.setVersion(GatewayController.GATEWAY_VERSION);
+		return serviceResponse;
 	}
 
 }
@@ -169,14 +175,11 @@ class ErorrHandler {
 	private static Logger LOG = LoggerFactory.getLogger(ErorrHandler.class);
 
 	@ExceptionHandler(value = Exception.class)
-	public void fallback(HttpServletResponse httpServletResponse) {
-		ServiceResponse serviceResponse = new ServiceResponse();
-		serviceResponse.setStatus(ServiceResponse.Status.ERROR);
-		try {
-			objectMapper.writeValue(httpServletResponse.getOutputStream(), serviceResponse);
-		} catch (IOException e) {
-			LOG.error("Failed to generate fallback response",e );
-		}
+	public ServiceResponse<ClientResponsePayload> fallback(HttpServletResponse httpServletResponse) {
+		ServiceResponse<ClientResponsePayload> serviceResponse = new ServiceResponse<>();
+		serviceResponse.setStatus(ResponseStatus.ERROR);
+		serviceResponse.setVersion(GatewayController.GATEWAY_VERSION);
+		return serviceResponse;
 	}
 
 
