@@ -11,17 +11,17 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public class ServiceMapping {
 
     @Id
-    private String clientServiceName;
+    private String id;
 
     @Indexed
     private String serviceName;
 
-    public String getClientServiceName() {
-        return clientServiceName;
+    public String getId() {
+        return id;
     }
 
-    public void setClientServiceName(String clientServiceName) {
-        this.clientServiceName = clientServiceName;
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getServiceName() {
@@ -30,5 +30,13 @@ public class ServiceMapping {
 
     public void setServiceName(String serviceName) {
         this.serviceName = serviceName;
+    }
+
+    @Override
+    public String toString() {
+        return "ServiceMapping{" +
+                "id='" + id + '\'' +
+                ", serviceName='" + serviceName + '\'' +
+                '}';
     }
 }
