@@ -6,7 +6,7 @@ import com.unidev.platform.common.dto.request.RequestWithVersion;
 /**
  * Serialized request, passed to appropriate service
  */
-public class ServiceRequest<T extends RequestPayload> extends RequestWithVersion<String, T> {
+public class ClientRequest<T extends ClientRequestPayload> extends RequestWithVersion<String, T> {
 
     private String service;
 
