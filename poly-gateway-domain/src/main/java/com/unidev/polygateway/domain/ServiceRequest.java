@@ -1,8 +1,9 @@
-package com.unidev.polygateway.model;
+package com.unidev.polygateway.domain;
 
 
 
 import com.unidev.platform.common.dto.request.Request;
+import com.unidev.polygateway.model.HeaderEntry;
 
 import java.util.ArrayList;
 import java.util.HashMap;

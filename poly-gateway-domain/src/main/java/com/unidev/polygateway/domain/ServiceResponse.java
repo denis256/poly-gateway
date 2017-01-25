@@ -1,4 +1,4 @@
-package com.unidev.polygateway.model;
+package com.unidev.polygateway.domain;
 
 
 import com.unidev.platform.common.dto.response.Response;
