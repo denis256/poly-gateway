@@ -12,6 +12,7 @@ import org.springframework.jmx.export.annotation.ManagedResource;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Basic JMX bean for updating service mappings
@@ -39,22 +40,19 @@ public class ServiceMapperMBean {
 
     @ManagedOperation(description = "Add mapping")
     @ManagedOperationParameters({
-            @ManagedOperationParameter(name = "id", description = "Id of mapping"),
-            @ManagedOperationParameter(name = "urlPattern", description = "Url pattern to match"),
-            @ManagedOperationParameter(name = "serviceName", description = "Service name which should process request")
+            @ManagedOperationParameter(name = "externalName", description = "external service name"),
+            @ManagedOperationParameter(name = "internalName", description = "internal service name")
     })
-    public String add(String id,
-                      String urlPattern,
-                      String serviceName) {
+    public String add(String externalName,
+                      String internalName) {
 
-        LOG.info("Adding {} {} {}", id, urlPattern, serviceName);
+        LOG.info("Adding {} {}", externalName, internalName);
 
         StringBuilder stringBuilder = new StringBuilder();
 
         ServiceMapping serviceMapping = new ServiceMapping();
-        serviceMapping.setId(id);
-        serviceMapping.setUrlPattern(urlPattern);
-        serviceMapping.setServiceName(serviceName);
+        serviceMapping.setId(externalName);
+        serviceMapping.setServiceName(internalName);
 
         LOG.info("serviceMapping {}", serviceMapping);
 
@@ -65,33 +63,6 @@ public class ServiceMapperMBean {
         stringBuilder.append(serviceMapping.toString());
 
         return stringBuilder.toString();
-    }
-
-    @ManagedOperation(description = "Update mapping")
-    @ManagedOperationParameters({
-            @ManagedOperationParameter(name = "id", description = "Id of mapping"),
-            @ManagedOperationParameter(name = "urlPattern", description = "Url pattern to match"),
-            @ManagedOperationParameter(name = "serviceName", description = "Service name which should process request")
-    })
-    public String update(String id,
-                         String urlPattern,
-                         String serviceName) {
-        try {
-            StringBuilder stringBuilder = new StringBuilder();
-
-            ServiceMapping serviceMapping = new ServiceMapping();
-            serviceMapping.setId(id);
-            serviceMapping.setUrlPattern(urlPattern);
-            serviceMapping.setServiceName(serviceName);
-
-            serviceMapping = serviceMapper.add(serviceMapping);
-            stringBuilder.append(serviceMapping.toString());
-
-            return stringBuilder.toString();
-        }catch (Throwable t) {
-            t.printStackTrace();
-            return "Error";
-        }
     }
 
     @ManagedOperation(description = "Remove mapping")
@@ -107,16 +78,21 @@ public class ServiceMapperMBean {
         return stringBuilder.toString();
     }
 
-    @ManagedOperation(description = "Match request url")
+    @ManagedOperation(description = "Match service")
     @ManagedOperationParameters({
-            @ManagedOperationParameter(name = "url", description = "url to match: /droidads/.*")
+            @ManagedOperationParameter(name = "externalName", description = "External service name used to match")
     })
-    public String match(String url) {
+    public String match(String externalName) {
         StringBuilder stringBuilder = new StringBuilder();
 
-        ServiceMapping match = serviceMapper.match(url);
-        stringBuilder.append("Match for url: " + url + "\n");
-        stringBuilder.append(match + "\n");
+        Optional<ServiceMapping> serviceMapping = serviceMapper.match(externalName);
+        if (serviceMapping.isPresent()) {
+            stringBuilder.append("Match for url: " + externalName + "\n");
+            stringBuilder.append(serviceMapping + "\n");
+        } else {
+            stringBuilder.append("Service mapping not found\n");
+
+        }
 
         return stringBuilder.toString();
     }
