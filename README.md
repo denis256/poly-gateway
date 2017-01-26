@@ -19,6 +19,14 @@ poly-gateway - gateway service which handle requests
 
 poly-gateway-client - default client to gateway
 
+
+## API calls
+
+Empty request to gateway url
+
+`curl -X POST -d {}  http://localhost:8000/gateway`
+
+
 ## Stack
 
  Java 8
