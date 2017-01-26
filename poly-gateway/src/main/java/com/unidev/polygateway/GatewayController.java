@@ -9,10 +9,7 @@ import com.unidev.polygateway.service.ServiceMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.ControllerAdvice;
-import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
 import javax.servlet.http.HttpServletRequest;
@@ -39,16 +36,18 @@ class GatewayController {
 	private WebUtils webUtils;
 
 	@Autowired
-	private ObjectMapper objectMapper;
-
-	@Autowired
 	private ServiceMapper serviceMapper;
 
 	//@HystrixCommand(fallbackMethod = "fallback")
-	@RequestMapping("/gateway")
-	public ServiceResponse<ClientResponsePayload> handle(HttpServletResponse httpServletResponse) {
+	@PostMapping("/gateway")
+	public ServiceResponse<ClientResponsePayload> handle() {
 
 		ServiceResponse<ClientResponsePayload> serviceResponse = new ServiceResponse<>();
+
+		if (true) {
+			throw new NullPointerException();
+		}
+
 		serviceResponse.setStatus(ResponseStatus.ERROR);
 		serviceResponse.setVersion(GatewayController.GATEWAY_VERSION);
 		return serviceResponse;
@@ -157,7 +156,7 @@ class GatewayController {
 //		return null;
 	}
 
-	public ServiceResponse<ClientResponsePayload> fallback(HttpServletResponse httpServletResponse) {
+	public ServiceResponse<ClientResponsePayload> fallback() {
 		ServiceResponse<ClientResponsePayload> serviceResponse = new ServiceResponse<>();
 		serviceResponse.setStatus(ResponseStatus.ERROR);
 		serviceResponse.setVersion(GatewayController.GATEWAY_VERSION);
@@ -169,13 +168,8 @@ class GatewayController {
 @ControllerAdvice
 class ErorrHandler {
 
-	@Autowired
-	private ObjectMapper objectMapper;
-
-	private static Logger LOG = LoggerFactory.getLogger(ErorrHandler.class);
-
 	@ExceptionHandler(value = Exception.class)
-	public ServiceResponse<ClientResponsePayload> fallback(HttpServletResponse httpServletResponse) {
+	public ServiceResponse<ClientResponsePayload> fallback() {
 		ServiceResponse<ClientResponsePayload> serviceResponse = new ServiceResponse<>();
 		serviceResponse.setStatus(ResponseStatus.ERROR);
 		serviceResponse.setVersion(GatewayController.GATEWAY_VERSION);
