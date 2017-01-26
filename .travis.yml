@@ -5,4 +5,4 @@ services: mongodb
 install:
  - ./gradlew assemble  -PXunidev
 script:
-  - ./gradlew clean test  -PXunidev
+  - ./gradlew clean test  -PXunidev  -Dspring.data.mongodb.uri=mongodb://127.0.0.1/polygateway
