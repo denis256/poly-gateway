@@ -2,6 +2,7 @@ package com.unidev.polygateway;
 
 import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
 import com.unidev.platform.j2ee.common.WebUtils;
+import com.unidev.polygateway.data.ServiceMapping;
 import com.unidev.polygateway.domain.*;
 import com.unidev.polygateway.service.ServiceMapper;
 import org.slf4j.Logger;
@@ -14,6 +15,9 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 /**
  * Gateway controller service
@@ -42,10 +46,24 @@ class GatewayController {
 	public @ResponseBody ClientResponse<ClientResponsePayload> handle(@RequestBody ClientRequest<ClientRequestPayload> clientRequest) {
 		LOG.info("Client request {}", clientRequest);
 
+		Optional<ServiceMapping> serviceMapping = serviceMapper.match(clientRequest.getService());
+		if (!serviceMapping.isPresent()) {
+			LOG.warn("Service mapping not found for {}", clientRequest);
+			ClientResponse clientResponse = ClientResponse.clientResponse();
+			clientResponse.setStatus(ResponseStatus.ERROR);
+			clientResponse.setVersion(GatewayController.GATEWAY_VERSION);
+			return clientResponse;
+		}
+
+		ServiceRequest<ClientRequestPayload> serviceRequest = new ServiceRequest<>();
+		serviceRequest.setPayload(clientRequest.getPayload());
+		serviceRequest.setClientVersion(clientRequest.getVersion());
+		List<Map.Entry<String, Object>> headers = webUtils.listAllHeaders(httpServletRequest);
+		serviceRequest.setHeaders(headers);
 
 
 		ClientResponse<ClientResponsePayload> serviceResponse = new ClientResponse<>();
-		serviceResponse.setStatus(ResponseStatus.ERROR);
+		serviceResponse.setStatus(ResponseStatus.OK);
 		serviceResponse.setVersion(GatewayController.GATEWAY_VERSION);
 		return serviceResponse;
 
