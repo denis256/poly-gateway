@@ -4,6 +4,8 @@ package com.unidev.polygateway.domain;
 import com.unidev.platform.common.dto.request.RequestWithVersion;
 
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Serialized request, passed to appropriate service
@@ -15,7 +17,7 @@ public class ServiceRequest<T extends ClientRequestPayload> extends RequestWithV
 
     private String clientVersion;
 
-    private HashMap<String, String[]> headers;
+    private List<Map.Entry<String, Object>> headers;
 
     public String getClientVersion() {
         return clientVersion;
@@ -25,11 +27,11 @@ public class ServiceRequest<T extends ClientRequestPayload> extends RequestWithV
         this.clientVersion = clientVersion;
     }
 
-    public HashMap<String, String[]> getHeaders() {
+    public List<Map.Entry<String, Object>> getHeaders() {
         return headers;
     }
 
-    public void setHeaders(HashMap<String, String[]> headers) {
+    public void setHeaders(List<Map.Entry<String, Object>> headers) {
         this.headers = headers;
     }
 }
