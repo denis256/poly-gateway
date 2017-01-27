@@ -24,7 +24,7 @@ poly-gateway-client - default client to gateway
 
 Empty request to gateway url
 
-`curl -X POST -d {}  http://localhost:8000/gateway`
+`curl -v  -H "Content-Type: application/json" -X POST -d {}  http://localhost:8000/gateway`
 
 
 ## Stack
