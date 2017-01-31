@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.web.servlet.ServletContextInitializer;
 import org.springframework.cloud.client.circuitbreaker.EnableCircuitBreaker;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
@@ -13,6 +14,7 @@ import org.springframework.cloud.client.loadbalancer.LoadBalanced;
 import org.springframework.cloud.netflix.zuul.EnableZuulProxy;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -34,10 +36,18 @@ public class GatewayApplication extends WebSecurityConfigurerAdapter implements 
 		SpringApplication.run(GatewayApplication.class, args);
 	}
 
+	@Bean
+	@ConfigurationProperties(prefix = "gateway.http.requests")
+	public HttpComponentsClientHttpRequestFactory httpRequestFactory()
+	{
+		return new HttpComponentsClientHttpRequestFactory();
+	}
+
+
 	@LoadBalanced
 	@Bean
 	public RestTemplate restTemplate() {
-		return new RestTemplate();
+		return new RestTemplate(httpRequestFactory());
 	}
 
 	@Bean
