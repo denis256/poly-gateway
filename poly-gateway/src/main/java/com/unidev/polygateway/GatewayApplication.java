@@ -32,63 +32,61 @@ import javax.servlet.ServletException;
 @EnableWebSecurity
 public class GatewayApplication extends WebSecurityConfigurerAdapter implements ServletContextInitializer {
 
-	public static void main(String[] args) {
-		SpringApplication.run(GatewayApplication.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(GatewayApplication.class, args);
+    }
 
-	@Bean
-	@ConfigurationProperties(prefix = "gateway.http.requests")
-	public HttpComponentsClientHttpRequestFactory httpRequestFactory()
-	{
-		return new HttpComponentsClientHttpRequestFactory();
-	}
+    @Bean
+    @ConfigurationProperties(prefix = "gateway.http.requests")
+    public HttpComponentsClientHttpRequestFactory httpRequestFactory() {
+        return new HttpComponentsClientHttpRequestFactory();
+    }
 
+    @LoadBalanced
+    @Bean
+    public RestTemplate restTemplate() {
+        return new RestTemplate(httpRequestFactory());
+    }
 
-	@LoadBalanced
-	@Bean
-	public RestTemplate restTemplate() {
-		return new RestTemplate(httpRequestFactory());
-	}
-
-	@Bean
-	public WebUtils webUtils() {
-		return new WebUtils();
-	}
+    @Bean
+    public WebUtils webUtils() {
+        return new WebUtils();
+    }
 
     @Override
     public void onStartup(ServletContext servletContext) throws ServletException {
         servletContext.addServlet("JmxMiniConsoleServlet", MiniConsoleServlet.class).addMapping("/jmx/*");
     }
 
-	@Override
-	protected void configure(HttpSecurity http) throws Exception {
-		http.csrf().disable();
-		http
-				.authorizeRequests()
-				.antMatchers("/jmx/**", "/logs").hasRole("ADMIN")
-				.antMatchers("/**", "/").permitAll()
-				.anyRequest().authenticated()
-				.and()
-				.formLogin()
-				.loginPage("/login")
-				.permitAll()
-				.and()
-				.logout()
-				.permitAll();
-	}
+    @Override
+    protected void configure(HttpSecurity http) throws Exception {
+        http.csrf().disable();
+        http
+                .authorizeRequests()
+                .antMatchers("/jmx/**", "/logs").hasRole("ADMIN")
+                .antMatchers("/**", "/").permitAll()
+                .anyRequest().authenticated()
+                .and()
+                .formLogin()
+                .loginPage("/login")
+                .permitAll()
+                .and()
+                .logout()
+                .permitAll();
+    }
 
-	@Value("${admin.user}")
-	private String adminUser;
+    @Value("${admin.user}")
+    private String adminUser;
 
-	@Value("${admin.password}")
-	private String adminPassword;
+    @Value("${admin.password}")
+    private String adminPassword;
 
-	@Autowired
-	public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
-		auth
-				.inMemoryAuthentication()
-				.withUser(adminUser).password(adminPassword).roles("ADMIN");
-	}
+    @Autowired
+    public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
+        auth
+                .inMemoryAuthentication()
+                .withUser(adminUser).password(adminPassword).roles("ADMIN");
+    }
 
 }
 
