@@ -8,6 +8,7 @@ import com.unidev.polygateway.service.ServiceMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.*;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -55,120 +56,38 @@ class GatewayController {
 			return clientResponse;
 		}
 
+		LOG.info("Resolved service {} to {}", clientRequest, serviceMapping.get());
+
 		ServiceRequest<ClientRequestPayload> serviceRequest = new ServiceRequest<>();
 		serviceRequest.setPayload(clientRequest.getPayload());
 		serviceRequest.setClientVersion(clientRequest.getVersion());
 		List<Map.Entry<String, Object>> headers = webUtils.listAllHeaders(httpServletRequest);
 		serviceRequest.setHeaders(headers);
 
+        HttpHeaders serviceRequestHeaders = new HttpHeaders();
+        serviceRequestHeaders.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<ServiceRequest<ClientRequestPayload>> requestHttpEntity = new HttpEntity<>(serviceRequest, serviceRequestHeaders);
 
-		ClientResponse<ClientResponsePayload> serviceResponse = new ClientResponse<>();
-		serviceResponse.setStatus(ResponseStatus.OK);
-		serviceResponse.setVersion(GatewayController.GATEWAY_VERSION);
-		return serviceResponse;
+		ResponseEntity<ServiceResponse> serviceResponseEntity = restTemplate
+					.exchange(serviceMapping.get().getServiceName(), HttpMethod.POST, requestHttpEntity, ServiceResponse.class);
 
-//		String uri = httpServletRequest.getRequestURI();
-//		LOG.debug("Processing request {}", uri);
-//		ServiceMapping serviceMapping = serviceMapper.match(uri);
-//		if (serviceMapping == null) {
-//			LOG.warn("No mapping found for {}", uri);
-//			return ;
-//		}
-//
-//		try {
-//
-//			ServiceRequest serviceRequest = new ServiceRequest();
-//			serviceRequest.setRequestURI(httpServletRequest.getRequestURI());
-//
-//			HashMap<String, String[]> parameterMap = new HashMap<>(httpServletRequest.getParameterMap());
-//			serviceRequest.setParameterMap(parameterMap);
-//
-//			String method = httpServletRequest.getMethod();
-//			String domain = webUtils.getDomain(httpServletRequest);
-//			String clientIp = webUtils.getClientIp(httpServletRequest);
-//			String referer = webUtils.getReferer(httpServletRequest);
-//			String userAgent = webUtils.getUserAgent(httpServletRequest);
-//
-//			serviceRequest.setMethod(method);
-//			serviceRequest.setDomain(domain);
-//			serviceRequest.setClientIp(clientIp);
-//			serviceRequest.setReferer(referer);
-//			serviceRequest.setUserAgent(userAgent);
-//
-//			Pattern pattern = Pattern.compile(serviceMapping.getUrlPattern());
-//			Matcher matcher = pattern.matcher(uri);
-//			if (matcher.find()) {
-//				int count = matcher.groupCount();
-//				for(int id = 0;id<count;id++) {
-//					String group = matcher.group(id + 1);
-//					serviceRequest.addMatchedUri(group);
-//				}
-//			}
-//
-//			List<Map.Entry<String, Object>> list = webUtils.listAllHeaders(httpServletRequest);
-//
-//			ArrayList<HeaderEntry> entries = new ArrayList<>();
-//
-//			for(Map.Entry<String, Object> item : list) {
-//				entries.add(new HeaderEntry(item.getKey() + "", item.getValue() + ""));
-//			}
-//
-//			serviceRequest.setHeaders(entries);
-//
-//			String body = IOUtils.toString(httpServletRequest.getInputStream());
-//			serviceRequest.setPayload(body);
-//
-//			// copy custom parameters
-//			serviceRequest.setCustomData(serviceMapping.getCustomParameters());
-//			serviceRequest.setRequestUriPattern(serviceMapping.getUrlPattern());
-//
-//			LOG.info("Service request {}", serviceRequest);
-//
-//			String serviceUri = "http://" + serviceMapping.getServiceName() + "/service";
-//			LOG.info("service request for {}", serviceUri);
-//
-//			HttpHeaders headers = new HttpHeaders();
-//			headers.setContentType(MediaType.APPLICATION_JSON);
-//
-//			HttpEntity<ServiceRequest> requestHttpEntity = new HttpEntity<>(serviceRequest,headers);
-//
-//			ResponseEntity<ServiceResponse> serviceEntity = restTemplate
-//					.exchange(serviceUri, HttpMethod.POST, requestHttpEntity, ServiceResponse.class);
-//
-//			ServiceResponse responseBody = serviceEntity.getBody();
-//			LOG.info("service response {}", responseBody);
-//
-//			if (responseBody.getStatus() == ServiceResponse.Status.ERROR) {
-//				LOG.error("Error status for {} {}", httpServletRequest.getRequestURI(), responseBody);
-//				return ;
-//			}
-//
-//			if (!Strings.isBlank(responseBody.getContentType())) {
-//				httpServletResponse.setContentType(responseBody.getContentType());
-//			}
-//
-//			switch (responseBody.getContent()) {
-//
-//				case CONTENT_INSIDE:
-//					IOUtils.write(responseBody.getPayload().toString(), httpServletResponse.getWriter());
-//					break;
-//				case LOCAL_FILE:
-//					FileInputStream fileInputStream = new FileInputStream(responseBody.getPayload().toString());
-//					IOUtils.copy(fileInputStream, httpServletResponse.getWriter());
-//					fileInputStream.close();
-//					break;
-//				case REMOTE_FILE:
-//					ResponseEntity<byte[]> entity = restTemplate.getForEntity(responseBody.getPayload().toString(), byte[].class);
-//					IOUtils.write(entity.getBody(), httpServletResponse.getWriter());
-//					break;
-//			}
-//
-//		}catch (Throwable t) {
-//			LOG.error("Failed to process request {}", httpServletRequest.getRequestURI(), t);
-//		}
-//
-//		return ;
-//		return null;
+        if (serviceResponseEntity.getStatusCode() == HttpStatus.OK) {
+            ServiceResponse<ClientResponsePayload> serviceResponseEntityBody = serviceResponseEntity.getBody();
+            ClientResponse<ClientResponsePayload> clientResponse = new ClientResponse<>();
+            clientResponse.setStatus(serviceResponseEntityBody.getStatus());
+            clientResponse.setVersion(GatewayController.GATEWAY_VERSION);
+            clientResponse.setPayload(serviceResponseEntityBody.getPayload());
+
+            return clientResponse;
+        }
+
+        LOG.warn("Failed to process {} {} {}", clientRequest, serviceMapping.get(), serviceResponseEntity.getStatusCode());
+        ClientResponse<ClientResponsePayload> clientResponse = new ClientResponse<>();
+        clientResponse.setStatus(ResponseStatus.ERROR);
+        clientResponse.setVersion(GatewayController.GATEWAY_VERSION);
+        clientResponse.setPayload(null);
+
+		return clientResponse;
 	}
 
 	public @ResponseBody  ClientResponse<ClientResponsePayload> fallback(@RequestBody ClientRequest<ClientRequestPayload> clientRequest) {
