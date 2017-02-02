@@ -36,8 +36,12 @@ public class ErorrHandler extends DefaultErrorAttributes {
     @Override
     public Map<String, Object> getErrorAttributes(RequestAttributes requestAttributes, boolean includeStackTrace) {
         Throwable throwable = getError(requestAttributes);
-        Throwable cause = throwable.getCause();
-        LOG.error("Handled exception", throwable, cause);
+        if (throwable != null) {
+            Throwable cause = throwable.getCause();
+            LOG.error("Handled exception", throwable, cause);
+        } else {
+            LOG.error("Handled exception", throwable);
+        }
         return Collections.emptyMap();
     }
 
