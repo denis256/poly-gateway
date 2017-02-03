@@ -1,7 +1,6 @@
 package com.unidev.polygateway;
 
 import com.unidev.platform.j2ee.common.WebUtils;
-import org.jminix.console.servlet.MiniConsoleServlet;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
@@ -55,7 +54,6 @@ public class GatewayApplication extends WebSecurityConfigurerAdapter implements 
 
     @Override
     public void onStartup(ServletContext servletContext) throws ServletException {
-        servletContext.addServlet("JmxMiniConsoleServlet", MiniConsoleServlet.class).addMapping("/jmx/*");
     }
 
     @Override

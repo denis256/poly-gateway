@@ -20,10 +20,6 @@ apply plugin: 'org.springframework.boot'
 
 sourceCompatibility = 1.8
 
-repositories {
-	maven { url 'http://maven.restlet.org' }
-}
-
 apply plugin: "com.gorylenko.gradle-git-properties"
 
 springBoot {
@@ -36,7 +32,6 @@ dependencies {
 	compile project(":poly-gateway-client-domain")
     compile("com.unidev.platform:unidev-strings:$project.unidevPlatformVersion")
     compile("com.unidev.platform:unidev-j2ee:$project.unidevPlatformVersion")
-    compile 'org.jminix:jminix:1.2.0'
     compile('org.springframework.boot:spring-boot-starter-data-mongodb')
 	compile('org.springframework.boot:spring-boot-starter-actuator')
 	compile('org.springframework.cloud:spring-cloud-starter-eureka')
