@@ -91,7 +91,7 @@ class GatewayController {
 	}
 
 	public @ResponseBody  ClientResponse<ClientResponsePayload> fallback(@RequestBody ClientRequest<ClientRequestPayload> clientRequest) {
-		LOG.info("Handling fallback method");
+		LOG.info("Handling fallback method for {}", clientRequest);
 		ClientResponse<ClientResponsePayload> serviceResponse = new ClientResponse<>();
 		serviceResponse.setStatus(ResponseStatus.ERROR);
 		serviceResponse.setVersion(GatewayController.GATEWAY_VERSION);
