@@ -28,7 +28,7 @@ Empty request to gateway url
 
 Invoke service "potato": 
 
-`curl -v  -H "Content-Type: application/json" -X POST -d '{ "service" : "potato" }'  http://localhost:8000/gateway`
+`curl -v  -H "Content-Type: application/json" -X POST -d '{ "service" : "potato", "payload" : {}, "version" : "1.0.0" }'  http://localhost:8000/gateway`
 
 
 ## Stack
