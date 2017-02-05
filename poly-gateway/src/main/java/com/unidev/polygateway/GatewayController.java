@@ -67,12 +67,13 @@ class GatewayController {
 		ServiceRequest<ClientRequestPayload> serviceRequest = new ServiceRequest<>();
 		serviceRequest.setPayload(clientRequest.getPayload());
 		serviceRequest.setClientVersion(clientRequest.getVersion());
+		serviceRequest.setVersion(GATEWAY_VERSION);
 		List<Map.Entry<String, Object>> headers = webUtils.listAllHeaders(httpServletRequest);
 		serviceRequest.setHeaders(headers);
 
         HttpHeaders serviceRequestHeaders = new HttpHeaders();
         serviceRequestHeaders.setContentType(MediaType.APPLICATION_JSON);
-        HttpEntity<HashMap> requestHttpEntity = new HttpEntity<>(new HashMap<>(), serviceRequestHeaders);
+        HttpEntity<ServiceRequest<ClientRequestPayload>> requestHttpEntity = new HttpEntity<>(serviceRequest, serviceRequestHeaders);
 
 		String serviceName = serviceMapping.get().getServiceName();
 		serviceName = serviceName.toLowerCase();
