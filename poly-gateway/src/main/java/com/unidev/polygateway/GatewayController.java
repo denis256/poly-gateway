@@ -1,5 +1,6 @@
 package com.unidev.polygateway;
 
+import com.netflix.governator.annotations.binding.Option;
 import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
 import com.unidev.platform.j2ee.common.WebUtils;
 import com.unidev.polygateway.data.ServiceMapping;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -47,13 +49,20 @@ class GatewayController {
 	public @ResponseBody ClientResponse<ClientResponsePayload> handle(@RequestBody ClientRequest<ClientRequestPayload> clientRequest) {
 		LOG.info("Client request {}", clientRequest);
 
-		Optional<ServiceMapping> serviceMapping = serviceMapper.match(clientRequest.getService());
-		if (!serviceMapping.isPresent()) {
-			LOG.warn("Service mapping not found for {}", clientRequest);
-			ClientResponse clientResponse = ClientResponse.clientResponse();
-			clientResponse.setStatus(ResponseStatus.ERROR);
-			clientResponse.setVersion(GatewayController.GATEWAY_VERSION);
-			return clientResponse;
+		ServiceMapping service = new ServiceMapping();
+		service.setServiceName("POLY-GATEWAY-SERVICE-TEMPLATE");
+		Optional<ServiceMapping> serviceMapping = Optional.of(service);
+//		Optional<ServiceMapping> serviceMapping = serviceMapper.match(clientRequest.getService());
+//		if (!serviceMapping.isPresent()) {
+//			LOG.warn("Service mapping not found for {}", clientRequest);
+//			ClientResponse clientResponse = ClientResponse.clientResponse();
+//			clientResponse.setStatus(ResponseStatus.ERROR);
+//			clientResponse.setVersion(GatewayController.GATEWAY_VERSION);
+//			return clientResponse;
+//		}
+
+		if (clientRequest.getPayload() == null) {
+			clientRequest.setPayload(new ClientRequestPayload());
 		}
 
 		LOG.info("Resolved service {} to {}", clientRequest, serviceMapping.get());
@@ -61,15 +70,18 @@ class GatewayController {
 		ServiceRequest<ClientRequestPayload> serviceRequest = new ServiceRequest<>();
 		serviceRequest.setPayload(clientRequest.getPayload());
 		serviceRequest.setClientVersion(clientRequest.getVersion());
-		List<Map.Entry<String, Object>> headers = webUtils.listAllHeaders(httpServletRequest);
-		serviceRequest.setHeaders(headers);
+//		List<Map.Entry<String, Object>> headers = webUtils.listAllHeaders(httpServletRequest);
+//		serviceRequest.setHeaders(headers);
 
         HttpHeaders serviceRequestHeaders = new HttpHeaders();
         serviceRequestHeaders.setContentType(MediaType.APPLICATION_JSON);
-        HttpEntity<ServiceRequest<ClientRequestPayload>> requestHttpEntity = new HttpEntity<>(serviceRequest, serviceRequestHeaders);
+        HttpEntity<HashMap> requestHttpEntity = new HttpEntity<>(new HashMap<>(), serviceRequestHeaders);
+
+		String serviceName = serviceMapping.get().getServiceName();
+		serviceName = serviceName.toLowerCase();
 
 		ResponseEntity<ServiceResponse> serviceResponseEntity = restTemplate
-					.exchange(serviceMapping.get().getServiceName(), HttpMethod.POST, requestHttpEntity, ServiceResponse.class);
+					.exchange(serviceName, HttpMethod.POST, requestHttpEntity, ServiceResponse.class);
 
         if (serviceResponseEntity.getStatusCode() == HttpStatus.OK) {
             ServiceResponse<ClientResponsePayload> serviceResponseEntityBody = serviceResponseEntity.getBody();

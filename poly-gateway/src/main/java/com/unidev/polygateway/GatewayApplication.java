@@ -1,5 +1,7 @@
 package com.unidev.polygateway;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.unidev.platform.j2ee.common.WebUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -12,8 +14,10 @@ import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.cloud.client.loadbalancer.LoadBalanced;
 import org.springframework.cloud.netflix.zuul.EnableZuulProxy;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Primary;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -44,7 +48,24 @@ public class GatewayApplication extends WebSecurityConfigurerAdapter implements 
     @LoadBalanced
     @Bean
     public RestTemplate restTemplate() {
-        return new RestTemplate(httpRequestFactory());
+        RestTemplate restTemplate =  new RestTemplate(httpRequestFactory());
+        restTemplate.getMessageConverters().add(0, mappingJacksonHttpMessageConverter());
+        return restTemplate;
+    }
+
+    @Bean
+    public MappingJackson2HttpMessageConverter mappingJacksonHttpMessageConverter() {
+        MappingJackson2HttpMessageConverter converter = new MappingJackson2HttpMessageConverter();
+        converter.setObjectMapper(objectMapper());
+        return converter;
+    }
+
+    @Bean
+    @Primary
+    public ObjectMapper objectMapper() {
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
+        return objectMapper;
     }
 
     @Bean
