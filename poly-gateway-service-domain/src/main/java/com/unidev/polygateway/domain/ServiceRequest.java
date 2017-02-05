@@ -34,4 +34,15 @@ public class ServiceRequest<T extends ClientRequestPayload> extends RequestWithV
     public void setHeaders(List<Map.Entry<String, Object>> headers) {
         this.headers = headers;
     }
+
+    @Override
+    public String toString() {
+        final StringBuffer sb = new StringBuffer("ServiceRequest{");
+        sb.append("clientVersion='").append(clientVersion).append('\'');
+        sb.append(", headers=").append(headers);
+        sb.append(", version=").append(version);
+        sb.append(", payload=").append(payload);
+        sb.append('}');
+        return sb.toString();
+    }
 }
