@@ -44,22 +44,19 @@ class GatewayController {
 	@Autowired
 	private ServiceMapper serviceMapper;
 
-	@HystrixCommand(fallbackMethod = "fallback")
+	//@HystrixCommand(fallbackMethod = "fallback")
 	@PostMapping("/gateway")
 	public @ResponseBody ClientResponse<ClientResponsePayload> handle(@RequestBody ClientRequest<ClientRequestPayload> clientRequest) {
 		LOG.info("Client request {}", clientRequest);
 
-		ServiceMapping service = new ServiceMapping();
-		service.setServiceName("POLY-GATEWAY-SERVICE-TEMPLATE");
-		Optional<ServiceMapping> serviceMapping = Optional.of(service);
-//		Optional<ServiceMapping> serviceMapping = serviceMapper.match(clientRequest.getService());
-//		if (!serviceMapping.isPresent()) {
-//			LOG.warn("Service mapping not found for {}", clientRequest);
-//			ClientResponse clientResponse = ClientResponse.clientResponse();
-//			clientResponse.setStatus(ResponseStatus.ERROR);
-//			clientResponse.setVersion(GatewayController.GATEWAY_VERSION);
-//			return clientResponse;
-//		}
+		Optional<ServiceMapping> serviceMapping = serviceMapper.match(clientRequest.getService());
+		if (!serviceMapping.isPresent()) {
+			LOG.warn("Service mapping not found for {}", clientRequest);
+			ClientResponse clientResponse = ClientResponse.clientResponse();
+			clientResponse.setStatus(ResponseStatus.ERROR);
+			clientResponse.setVersion(GatewayController.GATEWAY_VERSION);
+			return clientResponse;
+		}
 
 		if (clientRequest.getPayload() == null) {
 			clientRequest.setPayload(new ClientRequestPayload());
@@ -70,8 +67,8 @@ class GatewayController {
 		ServiceRequest<ClientRequestPayload> serviceRequest = new ServiceRequest<>();
 		serviceRequest.setPayload(clientRequest.getPayload());
 		serviceRequest.setClientVersion(clientRequest.getVersion());
-//		List<Map.Entry<String, Object>> headers = webUtils.listAllHeaders(httpServletRequest);
-//		serviceRequest.setHeaders(headers);
+		List<Map.Entry<String, Object>> headers = webUtils.listAllHeaders(httpServletRequest);
+		serviceRequest.setHeaders(headers);
 
         HttpHeaders serviceRequestHeaders = new HttpHeaders();
         serviceRequestHeaders.setContentType(MediaType.APPLICATION_JSON);
@@ -81,7 +78,7 @@ class GatewayController {
 		serviceName = serviceName.toLowerCase();
 
 		ResponseEntity<ServiceResponse> serviceResponseEntity = restTemplate
-					.exchange(serviceName, HttpMethod.POST, requestHttpEntity, ServiceResponse.class);
+					.exchange("http://"+serviceName+"/", HttpMethod.POST, requestHttpEntity, ServiceResponse.class);
 
         if (serviceResponseEntity.getStatusCode() == HttpStatus.OK) {
             ServiceResponse<ClientResponsePayload> serviceResponseEntityBody = serviceResponseEntity.getBody();
