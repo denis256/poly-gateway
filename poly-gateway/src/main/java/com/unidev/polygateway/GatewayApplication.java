@@ -67,6 +67,12 @@ public class GatewayApplication extends WebSecurityConfigurerAdapter implements 
     }
 
     @Bean
+    public ErrorHandler errorHandler() {
+        return new ErrorHandler();
+    }
+
+
+    @Bean
     public WebUtils webUtils() {
         return new WebUtils();
     }
