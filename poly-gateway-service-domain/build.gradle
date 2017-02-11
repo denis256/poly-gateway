@@ -1,4 +1,0 @@
-dependencies {
-
-	compile project(":poly-gateway-client-domain")
-}

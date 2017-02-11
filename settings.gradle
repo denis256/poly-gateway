@@ -1,4 +1,2 @@
 include "poly-gateway"
-include "poly-gateway-client"
-include "poly-gateway-client-domain"
-include "poly-gateway-service-domain"
+
