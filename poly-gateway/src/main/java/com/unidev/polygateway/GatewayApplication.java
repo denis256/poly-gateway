@@ -55,7 +55,7 @@ public class GatewayApplication extends WebSecurityConfigurerAdapter implements 
     @LoadBalanced
     @Bean
     public RestTemplate restTemplate() {
-        RestTemplate restTemplate =  new RestTemplate(httpRequestFactory());
+        RestTemplate restTemplate =  new RestTemplate( httpRequestFactory() );
         restTemplate.getMessageConverters().add(0, mappingJacksonHttpMessageConverter());
         return restTemplate;
     }
@@ -76,16 +76,11 @@ public class GatewayApplication extends WebSecurityConfigurerAdapter implements 
     }
 
     @Bean
-    public ErrorHandler errorHandler() {
-        return new ErrorHandler();
-    }
-
-    @Bean
     public ErrorAttributes errorAttributes() {
         return new DefaultErrorAttributes() {
             @Override
             public Map<String, Object> getErrorAttributes(RequestAttributes requestAttributes, boolean includeStackTrace) {
-                Map<String, Object> errorAttributes = super.getErrorAttributes(requestAttributes, includeStackTrace);
+                Map<String, Object> errorAttributes = super.getErrorAttributes(requestAttributes, true);
                 LOG.warn("Error during request processing {}", errorAttributes);
                 errorAttributes.clear();
                 return errorAttributes;
