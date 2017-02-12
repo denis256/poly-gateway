@@ -3,10 +3,14 @@ package com.unidev.polygateway;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.unidev.platform.j2ee.common.WebUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.web.DefaultErrorAttributes;
+import org.springframework.boot.autoconfigure.web.ErrorAttributes;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.web.servlet.ServletContextInitializer;
 import org.springframework.cloud.client.circuitbreaker.EnableCircuitBreaker;
@@ -22,9 +26,11 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.context.request.RequestAttributes;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
+import java.util.Map;
 
 @SpringBootApplication
 @EnableDiscoveryClient
@@ -32,6 +38,9 @@ import javax.servlet.ServletException;
 @EnableZuulProxy
 @EnableWebSecurity
 public class GatewayApplication extends WebSecurityConfigurerAdapter implements ServletContextInitializer {
+
+    private static Logger LOG = LoggerFactory.getLogger(GatewayApplication.class);
+
 
     public static void main(String[] args) {
         SpringApplication.run(GatewayApplication.class, args);
@@ -71,6 +80,19 @@ public class GatewayApplication extends WebSecurityConfigurerAdapter implements 
         return new ErrorHandler();
     }
 
+    @Bean
+    public ErrorAttributes errorAttributes() {
+        return new DefaultErrorAttributes() {
+            @Override
+            public Map<String, Object> getErrorAttributes(RequestAttributes requestAttributes, boolean includeStackTrace) {
+                Map<String, Object> errorAttributes = super.getErrorAttributes(requestAttributes, includeStackTrace);
+                LOG.warn("Error during request processing {}", errorAttributes);
+                errorAttributes.clear();
+                return errorAttributes;
+            }
+
+        };
+    }
 
     @Bean
     public WebUtils webUtils() {

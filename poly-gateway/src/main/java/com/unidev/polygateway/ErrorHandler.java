@@ -22,7 +22,7 @@ public class ErrorHandler extends ZuulFilter {
     @Override
     public int filterOrder() {
 
-        return 1;
+        return -1;
     }
 
     @Override
