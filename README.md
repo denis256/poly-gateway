@@ -9,27 +9,23 @@ Current version: 0.1.0-SNAPSHOT
 Released version: 0.0.1
 
 Gradle dependency 
+
 ```compile 'com.unidev.polygateway:poly-gateway:0.0.1' ```
 
-## Modules
+Services are mapped through path `/api/**`
 
-poly-gateway-model - model objects, used to handle requests, responses
+## Ports
 
-poly-gateway - gateway service which handle requests
+8000 - port for web requests
 
-poly-gateway-client - default client to gateway
+8001 - management interface
 
 
 ## API calls
 
-Empty request to gateway url
+List available services
 
-`curl -v  -H "Content-Type: application/json" -X POST -d {}  http://localhost:8000/gateway`
-
-Invoke service "potato": 
-
-`curl -v  -H "Content-Type: application/json" -X POST -d '{ "service" : "potato", "payload" : {}, "version" : "1.0.0" }'  http://localhost:8000/gateway`
-
+`curl -v http://localhost:8001/routes`
 
 ## Stack
 
@@ -38,8 +34,6 @@ Invoke service "potato":
  Spring Cloud: eureka, hystrix 
  
  Spring Boot 1.4.x
-
- Vaadin
 
  Gradle
 
