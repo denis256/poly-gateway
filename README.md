@@ -12,7 +12,7 @@ Gradle dependency
 
 ```compile 'com.unidev.polygateway:poly-gateway:0.0.1' ```
 
-Services are mapped through path `/api/**`
+Services are mapped through path `/api/**` and are forwarder with /api prefix
 
 ## Ports
 
