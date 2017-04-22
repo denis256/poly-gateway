@@ -1,3 +1,6 @@
+## Project for testing commit history processing
+
+
 # poly-gateway
 
 [![Build Status](https://travis-ci.org/universal-development/poly-gateway.svg?branch=master)](https://travis-ci.org/universal-development/poly-gateway)
